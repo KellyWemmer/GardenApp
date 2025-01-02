@@ -2,7 +2,7 @@
 
 namespace GardenApp.Models
 {
-    public class AnnualPlantStarterModel
+    public class PlantStartModel
     {
         public int Id { get; set; }
         //One to Many with PlantInfoTable

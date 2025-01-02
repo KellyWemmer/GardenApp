@@ -1,6 +1,6 @@
 ﻿namespace GardenApp.Models
 {
-    public class AnnualPlantSuccessModel
+    public class PlantSuccessModel
     {
         public int Id { get; set; }
         //One to Many with PlantInfoTable
@@ -13,6 +13,7 @@
         public int ActualUpperTemp { get; set; }
         public int RecommendedLowerTemp { get; set; }
         public int ActualLowerTemp { get;set; }
+        public bool StartedFromSeed { get; set; }
         public string? PestsEncountered { get; set; }
         public string? HowToWinterize { get; set; }
         public string? OtherIssues { get; set; }

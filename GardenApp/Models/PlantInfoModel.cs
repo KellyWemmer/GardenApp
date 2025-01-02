@@ -2,7 +2,7 @@
 {
     public class PlantInfoModel
     {
-        //One to Many with PlantStarterTable
+        //One to Many with PlantStartTable
         //One to Many with PlantSuccessTable
         public int Id { get; set; }
         public string? CommonName { get; set; }
