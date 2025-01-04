@@ -8,12 +8,10 @@
         //One to Many with YearTable
         public int YearId { get; set; }
         public DateTime RecommendedTransplantDate { get; set; }
-        public DateTime ActualTransplantDate { get; set; }
+        public DateTime? ActualPlantingDate { get; set; }
         public int RecommendedUpperTemp { get; set; }
-        public int ActualUpperTemp { get; set; }
         public int RecommendedLowerTemp { get; set; }
-        public int ActualLowerTemp { get;set; }
-        public bool StartedFromSeed { get; set; }
+        public bool StartedFromSeedOutdoors { get; set; }
         public string? PestsEncountered { get; set; }
         public string? HowToWinterize { get; set; }
         public string? OtherIssues { get; set; }

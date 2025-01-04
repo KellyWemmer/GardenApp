@@ -16,23 +16,33 @@ namespace GardenApp.Controllers
             _logger = logger;
         }
 
+        //Need a list of All years to be able to search them
+        private readonly List<YearModel> _yearModels = new List<YearModel>();
+
         //Need getByYear
         //Need getByRecommendedStartDate or ActualStartDate?
         //Need to getByPreferredMethod = True?
 
         [HttpGet]
-        public ActionResult<List<PlantStartModel>> GetPlantStarts()
+        public IActionResult GetPlantStarts()
         {
+            if (_plantStarts == null || !_plantStarts.Any())
+            {
+                _logger.LogWarning("No plantStarts found");
+                return NotFound();
+            }
+
+            _logger.LogInformation("{Count} plantStarts found", _plantStarts.Count());
             return Ok(_plantStarts);
         }
 
         [HttpGet("Id")]
-        public ActionResult<PlantStartModel> GetPlantStart(int id)
+        public IActionResult GetPlantStart(int id)
         {
             PlantStartModel? plantStart = _plantStarts.FirstOrDefault(x => x.Id == id);
             if (plantStart == null)
             {
-                _logger.LogWarning("No plantStarts found for plantStartId: {id}", id);
+                _logger.LogWarning("No plantStart found for plantStartId: {id}", id);
                 return NotFound();
             }
             _logger.LogInformation("Returning plantStart for plantStartId: {id}", id);
@@ -40,38 +50,76 @@ namespace GardenApp.Controllers
         }
 
         [HttpGet("{YearId}")]
-        public ActionResult<List<PlantStartModel>> GetPlantStartByYear(int yearId)
+        public IActionResult GetPlantStartByYear(int yearId)
         {
             List<PlantStartModel> plantStartsByYear = _plantStarts.Where(p => p.YearId == yearId).ToList();
-            if (!plantStartsByYear.Any())
+            YearModel? yearModel = _yearModels.FirstOrDefault(y => y.Id == yearId);
+            if (plantStartsByYear == null || !plantStartsByYear.Any())
             {
-                _logger.LogWarning("No plantStarts found for YearId: yearId", yearId);
+                if(yearModel != null)
+                {
+                    //No plantStarts found for specific year
+                    _logger.LogWarning("No plantStarts found for Year: {year}", yearModel.Year);
+                    return NotFound();
+                }
+                else
+                {
+                    _logger.LogWarning("No year found for {year}", yearModel.Year);
+                }
                 return NotFound();
             }
-            _logger.LogInformation("{Count} plantStarts returned for YearId: {yearId}", yearId);
-            return Ok(plantStartsByYear);
+            else
+            {
+                //There are plantStarts found
+                if (yearModel != null)
+                {
+                _logger.LogInformation("{Count} plantStarts returned for YearId: {yearId}", yearId);
+                return Ok(plantStartsByYear);
+
+                }
+                else
+                {
+                    //Year not found
+                    _logger.LogWarning("No year found for {year}", yearModel.Year);
+                    return NotFound(plantStartsByYear);
+                }
+
+            }
         }
 
         [HttpPost]
-        public ActionResult<PlantStartModel> CreatePlantStart(PlantStartModel newPlantStart)
+        public IActionResult CreatePlantStart([FromBody] PlantStartModel newPlantStart)
         {
-            newPlantStart.Id = _plantStarts.Any() ? _plantStarts.Max(x => x.Id) + 1 : 1;
-            _plantStarts.Add(newPlantStart);
-            return CreatedAtAction(nameof(GetPlantStart), new { id = newPlantStart.Id }, newPlantStart);
+
+            try
+            {
+                newPlantStart.Id = _plantStarts.Any() ? _plantStarts.Max(x => x.Id) + 1 : 1;
+                _plantStarts.Add(newPlantStart);
+                _logger.LogInformation("Successfully added newPlantStart: {@NewPlantStart}", newPlantStart);
+                return CreatedAtAction(nameof(GetPlantStart), new { id = newPlantStart.Id }, newPlantStart);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while creating newPlantStart:{@NewPlantStart", newPlantStart);
+                return StatusCode(500, "An error occurred while creating newPlantStart");
+               
+            }
+
         }
 
         [HttpPut("Id")]
-        public ActionResult<PlantStartModel> UpdatePlantStart(int id, PlantStartModel plantStartToUpdate)
+        public IActionResult UpdatePlantStart(int id, [FromBody] PlantStartModel plantStartToUpdate)
         {
             PlantStartModel? existingPlantStart = _plantStarts.FirstOrDefault(i  => i.Id == id); 
             if (existingPlantStart == null)
             {
+                _logger.LogWarning("No plantStart found to update for Id: {id}", id);
                 return NotFound();
             }
             existingPlantStart.PlantInfoId = plantStartToUpdate.PlantInfoId;
             existingPlantStart.YearId = plantStartToUpdate.YearId;
-            existingPlantStart.RecommendedStartDate = plantStartToUpdate.RecommendedStartDate;
-            existingPlantStart.ActualStartDate = plantStartToUpdate.ActualStartDate;
+            existingPlantStart.RecommendedIndoorStartDate = plantStartToUpdate.RecommendedIndoorStartDate;
+            existingPlantStart.ActualIndoorStartDate = plantStartToUpdate.ActualIndoorStartDate;
             existingPlantStart.SeedlingEnvironment = plantStartToUpdate.SeedlingEnvironment;
             existingPlantStart.GerminationRate = plantStartToUpdate.GerminationRate;
             existingPlantStart.Issues = plantStartToUpdate.Issues;
@@ -82,14 +130,16 @@ namespace GardenApp.Controllers
         }
 
         [HttpDelete("Id")]
-        public ActionResult<PlantStartModel> DeletePlantStart(int id)
+        public IActionResult DeletePlantStart(int id)
         {
             PlantStartModel? plantStartToDelete = _plantStarts.FirstOrDefault(i => i.Id == id);  
             if (plantStartToDelete == null)
             {
+                _logger.LogWarning("No plantStart found to delete for Id; {id}", id);
                 return NotFound();
             }
             _plantStarts.Remove(plantStartToDelete);
+            _logger.LogInformation("plantStart was deleted for Id: {id}", id);
             return NoContent();
         }
 
