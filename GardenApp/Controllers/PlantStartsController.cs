@@ -57,12 +57,12 @@ namespace GardenApp.Controllers
                 if(yearModel != null)
                 {
                     //No plantStarts found for specific year
-                    _logger.LogWarning("No plantStarts found for Year: {@PlantStarts}", _plantStarts);
+                    _logger.LogWarning("No plantStarts found for Year: {year}", yearModel.Year);
                     return NotFound();
                 }
                 else
                 {
-                    _logger.LogWarning("No year found for {@YearModels}", _yearModels);
+                    _logger.LogWarning("No year found for {yearId}", yearId);
                     return NotFound();
                 }
             }
@@ -71,14 +71,14 @@ namespace GardenApp.Controllers
                 //There are plantStarts found
                 if (yearModel != null)
                 {
-                _logger.LogInformation("{Count} plantStarts returned for YearId: {@PlantStarts}", _plantStarts.Count());
+                _logger.LogInformation("{Count} plantStarts returned for YearId: {yearId}", yearId);
                 return Ok(plantStartsByYear);
 
                 }
                 else
                 {
                     //Year not found
-                    _logger.LogWarning("No year found for {@YearModels}", _yearModels);
+                    _logger.LogWarning("No year found for {year}", yearModel.Year);
                     return NotFound(plantStartsByYear);
                 }
 
