@@ -19,8 +19,6 @@ namespace GardenApp.Controllers
         //Need a list of All years to be able to search them
         private readonly List<YearModel> _yearModels = new List<YearModel>();
 
-        //Need getByYear
-        //Need getByRecommendedStartDate or ActualStartDate?
         //Need to getByPreferredMethod = True?
 
         [HttpGet]
@@ -36,7 +34,7 @@ namespace GardenApp.Controllers
             return Ok(_plantStarts);
         }
 
-        [HttpGet("Id")]
+        [HttpGet("PlantStart/{id}")]
         public IActionResult GetPlantStart(int id)
         {
             PlantStartModel? plantStart = _plantStarts.FirstOrDefault(x => x.Id == id);
@@ -49,7 +47,7 @@ namespace GardenApp.Controllers
             return Ok(plantStart);
         }
 
-        [HttpGet("{YearId}")]
+        [HttpGet("Year/{yearId}")]
         public IActionResult GetPlantStartByYear(int yearId)
         {
             List<PlantStartModel> plantStartsByYear = _plantStarts.Where(p => p.YearId == yearId).ToList();
@@ -59,31 +57,63 @@ namespace GardenApp.Controllers
                 if(yearModel != null)
                 {
                     //No plantStarts found for specific year
-                    _logger.LogWarning("No plantStarts found for Year: {year}", yearModel.Year);
+                    _logger.LogWarning("No plantStarts found for Year: {@PlantStarts}", _plantStarts);
                     return NotFound();
                 }
                 else
                 {
-                    _logger.LogWarning("No year found for {year}", yearModel.Year);
+                    _logger.LogWarning("No year found for {@YearModels}", _yearModels);
+                    return NotFound();
                 }
-                return NotFound();
             }
             else
             {
                 //There are plantStarts found
                 if (yearModel != null)
                 {
-                _logger.LogInformation("{Count} plantStarts returned for YearId: {yearId}", yearId);
+                _logger.LogInformation("{Count} plantStarts returned for YearId: {@PlantStarts}", _plantStarts.Count());
                 return Ok(plantStartsByYear);
 
                 }
                 else
                 {
                     //Year not found
-                    _logger.LogWarning("No year found for {year}", yearModel.Year);
+                    _logger.LogWarning("No year found for {@YearModels}", _yearModels);
                     return NotFound(plantStartsByYear);
                 }
 
+            }
+        }
+
+        [HttpGet("Month/{month}")]
+        public IActionResult GetPlantStartsByMonth(int month)
+        {
+            List<PlantStartModel> plantStartsByMonth = _plantStarts.Where(p => p.ActualIndoorStartDate.Month == month).ToList();
+            if (plantStartsByMonth == null || !plantStartsByMonth.Any())
+            {
+                _logger.LogWarning("No plantStarts found for month {Month}", month);
+                return NotFound();
+            }
+            else
+            {
+                _logger.LogInformation("{Count} plantStarts were found for month: month", plantStartsByMonth.Count);
+                return Ok(plantStartsByMonth);
+            }
+        }
+
+        [HttpGet("Method/{preferredMethod}")]
+        public IActionResult GetPlantStartByPreferredMethod(bool preferredMethod)
+        {
+            List<PlantStartModel> preferredPlantStartMethods = _plantStarts.Where(p => p.IsPreferredMethod == true).ToList();
+            if (preferredPlantStartMethods == null || !preferredPlantStartMethods.Any())
+            {
+                _logger.LogWarning("No plantStarts preferred methods were found");
+                return NotFound();
+            }
+            else
+            {
+                _logger.LogInformation("{Count} plantStarts found for preferredMethod", preferredPlantStartMethods.Count());
+                return Ok(preferredPlantStartMethods);
             }
         }
 
@@ -107,7 +137,7 @@ namespace GardenApp.Controllers
 
         }
 
-        [HttpPut("Id")]
+        [HttpPut("{id}")]
         public IActionResult UpdatePlantStart(int id, [FromBody] PlantStartModel plantStartToUpdate)
         {
             PlantStartModel? existingPlantStart = _plantStarts.FirstOrDefault(i  => i.Id == id); 
@@ -129,7 +159,7 @@ namespace GardenApp.Controllers
             return NoContent();
         }
 
-        [HttpDelete("Id")]
+        [HttpDelete("{id}")]
         public IActionResult DeletePlantStart(int id)
         {
             PlantStartModel? plantStartToDelete = _plantStarts.FirstOrDefault(i => i.Id == id);  
