@@ -19,8 +19,6 @@ namespace GardenApp.Controllers
         //Need a list of All years to be able to search them
         private readonly List<YearModel> _yearModels = new List<YearModel>();
 
-        //Need to getByPreferredMethod = True?
-
         [HttpGet]
         public IActionResult GetPlantStarts()
         {
