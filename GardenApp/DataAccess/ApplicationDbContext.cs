@@ -13,15 +13,14 @@ namespace GardenApp.DataAccess
         }
         public DbSet<PlantInfoModel> PlantInfo { get; set; }    
         public DbSet<PlantStartModel> PlantStart { get; set; }
-        public DbSet<PlantSuccessModel> PlantSuccess { get; set; }
-        public DbSet<YearModel> Year { get; set; }
+        public DbSet<PlantSuccessModel> PlantSuccess { get; set; }       
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
                 var connectionString = _configuration.GetConnectionString("DefaultConnection");
-                optionsBuilder.UseSqlServer();
+                optionsBuilder.UseSqlServer(connectionString);
             }
          
         }

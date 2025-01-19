@@ -4,9 +4,7 @@
     {
         public int Id { get; set; }
         //One to Many with PlantInfoTable
-        public int PlantId { get; set; }
-        //One to Many with YearTable
-        public int YearId { get; set; }
+        public int PlantId { get; set; }  
         public DateTime RecommendedTransplantDate { get; set; }
         public DateTime? ActualPlantingDate { get; set; }
         public int RecommendedUpperTemp { get; set; }
