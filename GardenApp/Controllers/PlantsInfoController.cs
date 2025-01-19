@@ -18,11 +18,8 @@ namespace GardenApp.Controllers
             //_plantsInfoService
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
-        {
-            var plantsInfo == await
-        }
+        
+       
 
     }
 }

@@ -23,16 +23,34 @@ namespace GardenApp.Services
             return await _context.PlantStart.FirstOrDefaultAsync(p => p.Id == id);
         }
 
-        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByYear(int year)
+        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByActualStartYear(int year)
         {
             return await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Year == year).ToListAsync();
         }
 
-        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByMonth(int month)
+        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByActualStartMonth(int month)
         {
             return await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Month == month).ToListAsync();
         }
 
+        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByRecommendedStartYear(int year)
+        {
+            return await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Year == year).ToListAsync();
+        }
+
+        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByRecommendedStartMonth(int month)
+        {
+            return await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Month == month).ToListAsync();
+        }
+
+        public async Task<IEnumerable<PlantStartModel>> GetPlantStartsByPeferredMethod(bool preferredMethod)
+        {
+            return await _context.PlantStart.Where(p => p.IsPreferredMethod == true).ToListAsync();
+        }
+
+     
+
+      
 
     }
 }

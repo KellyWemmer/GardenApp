@@ -41,7 +41,7 @@ namespace GardenApp.Controllers
         [HttpGet("PlantStart/{id}")]
         public async Task<IActionResult> GetPlantStart(int id)
         {
-            var plantStart = await _context.PlantStart.FirstOrDefaultAsync(x => x.Id == id);
+            var plantStart = await _plantStartsService.GetPlantStart(id);
             if (plantStart == null)
             {
                 _logger.LogWarning("No plantStart found for plantStartId: {id}", id);
@@ -50,36 +50,67 @@ namespace GardenApp.Controllers
             _logger.LogInformation("Returning plantStart for plantStartId: {id}", id);
             return Ok(plantStart);
         }
-
-        [HttpGet("Year/{year}")]
-        public async Task<IActionResult> GetPlantStartByYear(int year)
+        //Get by recommended dates
+        [HttpGet("RecYear/{year}")]
+        public async Task<IActionResult> GetPlantStartByRecommendedStartYear(int year)
         {
-            var plantStartsByYear = await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Year == year).ToListAsync();
+            var plantStartsByYear = await _plantStartsService.GetPlantStartsByRecommendedStartYear(year);
             if (plantStartsByYear == null)
             {
-                _logger.LogWarning("No plantStarts found for Year: {year}", year);
+                _logger.LogWarning("No plantStarts found for recommended start year: {Year}", year);
                 return NotFound();
             }
             else
             {
-                _logger.LogInformation("{Count} plantStarts returned for Year: {year}", plantStartsByYear.Count, year);
+                _logger.LogInformation("{Count} plantStarts returned for recommended start year: {Year}", plantStartsByYear.Count(), year);
                 return Ok(plantStartsByYear);
             }
         }
-       
 
-        [HttpGet("Month/{month}")]
-        public async Task<IActionResult> GetPlantStartsByMonth(int month)
+        [HttpGet("RecMonth/{month}")]
+        public async Task<IActionResult> GetPlantStartsByRecommendedStartMonth(int month)
         {
-            List<PlantStartModel> plantStartsByMonth = await _context.PlantStart.Where(p => p.ActualIndoorStartDate.Month == month).ToListAsync();
+            var plantStartsByMonth = await _plantStartsService.GetPlantStartsByRecommendedStartMonth(month);
             if (plantStartsByMonth == null || !plantStartsByMonth.Any())
             {
-                _logger.LogWarning("No plantStarts found for month {Month}", month);
+                _logger.LogWarning("No plantStarts found for recommended start month: {Month}", month);
                 return NotFound();
             }
             else
             {
-                _logger.LogInformation("{Count} plantStarts were found for month: month", plantStartsByMonth.Count);
+                _logger.LogInformation("{Count} plantStarts were found for recommended start month: {Month}", plantStartsByMonth.Count(), month);
+                return Ok(plantStartsByMonth);
+            }
+        }
+        //Get by actual dates
+        [HttpGet("ActYear/{year}")]
+        public async Task<IActionResult> GetPlantStartByActualStartYear(int year)
+        {
+            var plantStartsByYear = await _plantStartsService.GetPlantStartsByActualStartYear(year);
+            if (plantStartsByYear == null)
+            {
+                _logger.LogWarning("No plantStarts found for actual start year: {Year}", year);
+                return NotFound();
+            }
+            else
+            {
+                _logger.LogInformation("{Count} plantStarts returned for actual start year: {Year}", plantStartsByYear.Count(), year);
+                return Ok(plantStartsByYear);
+            }
+        }
+
+        [HttpGet("ActMonth/{month}")]
+        public async Task<IActionResult> GetPlantStartsByActualStartMonth(int month)
+        {
+            var plantStartsByMonth = await _plantStartsService.GetPlantStartsByActualStartMonth(month);
+            if (plantStartsByMonth == null || !plantStartsByMonth.Any())
+            {
+                _logger.LogWarning("No plantStarts found for actual start month: {Month}", month);
+                return NotFound();
+            }
+            else
+            {
+                _logger.LogInformation("{Count} plantStarts were found for actual start month: {Month}", plantStartsByMonth.Count(), month);
                 return Ok(plantStartsByMonth);
             }
         }
